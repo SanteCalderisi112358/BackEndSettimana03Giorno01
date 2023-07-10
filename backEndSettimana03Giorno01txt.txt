@@ -1,0 +1,124 @@
+Clienti
+-- Table: public.clienti
+
+-- DROP TABLE IF EXISTS public.clienti;
+
+CREATE TABLE IF NOT EXISTS public.clienti
+(
+    numero_cliente integer NOT NULL DEFAULT nextval('clienti_numero_cliente_seq'::regclass),
+    nome character varying COLLATE pg_catalog."default" NOT NULL,
+    cognome character varying COLLATE pg_catalog."default" NOT NULL,
+    data_nascita date NOT NULL,
+    regione_residenza character varying COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT clienti_pkey PRIMARY KEY (numero_cliente)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.clienti
+    OWNER to postgres;
+	INSERT INTO public.clienti (nome, cognome, data_nascita, regione_residenza)
+VALUES
+    ('Sante', 'Calderisi', '1989-08-17', 'Puglia'),
+    ('Erika', 'Quitadamo', '1992-10-10', 'Puglia'),
+    ('Luigi', 'Taronna', '1982-12-03', 'Toscana'),
+    ('Luca','Notarangelo' , '1992-07-21', 'Veneto'),
+    ('Marco', 'Ferrari', '1983-04-08', 'Emilia-Romagna')
+
+FATTURE
+-- Table: public.fatture
+
+-- DROP TABLE IF EXISTS public.fatture;
+
+CREATE TABLE IF NOT EXISTS public.fatture
+(
+    numero_fattura integer NOT NULL DEFAULT nextval('fatture_numero_fattura_seq'::regclass),
+    tipologia character varying COLLATE pg_catalog."default" NOT NULL,
+    importo double precision NOT NULL,
+    iva double precision NOT NULL,
+    cliente_id integer NOT NULL DEFAULT nextval('fatture_cliente_id_seq'::regclass),
+    data_fattura date NOT NULL,
+    numero_fornitore integer NOT NULL DEFAULT nextval('fatture_numero_fornitore_seq'::regclass),
+    CONSTRAINT fatture_pkey PRIMARY KEY (numero_fattura)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.fatture
+    OWNER to postgres;
+-- fatture per Sante (numero_cliente=1)
+
+INSERT INTO public.fatture(
+	 tipologia, importo, iva, cliente_id, data_fattura, numero_fornitore)
+	VALUES ('Auto', 1000.90, 20, 1, '2023-06-03', 1);
+	VALUES ('Abito', 99.00, 15, 1, '2022-05-02', 3);
+	VALUES ('Alimentari', 34.99, 4, 1, '2020-06-09', 2);
+	
+	-- fatture per Erika (numero_cliente=2)
+	INSERT INTO public.fatture (tipologia, importo, iva, cliente_id, data_fattura, numero_fornitore)
+VALUES
+    ('Alimentari', 300.60, 25, 2, '2023-07-10', 2),
+    ('Abito', 250.00, 20, 2, '2023-06-15', 3),
+    ('Auto', 180.00, 5, 2, '2023-05-20', 1);
+	
+	-- fatture per Luigi (numero_cliente=3)
+		INSERT INTO public.fatture (tipologia, importo, iva, cliente_id, data_fattura, numero_fornitore)
+VALUES
+    ('Alimentari', 300.60, 5, 3, '2023-07-10', 1),
+    ('Abito', 250.00, 15, 3, '2023-06-15', 2),
+    ('Auto', 180.00, 20, 3, '2023-05-20', 3);
+	
+	-- fatture per Luca (numero_cliente=4)
+		INSERT INTO public.fatture (tipologia, importo, iva, cliente_id, data_fattura, numero_fornitore)
+VALUES
+    ('Alimentari', 300.60, 5, 4, '2023-07-10', 1),
+    ('Abito', 250.00, 15, 4, '2023-06-15', 2),
+    ('Auto', 180.00, 20, 4, '2023-05-20', 3);
+	
+		-- fatture per Marco (numero_cliente=5)
+		INSERT INTO public.fatture (tipologia, importo, iva, cliente_id, data_fattura, numero_fornitore)
+VALUES
+    ('Alimentari', 300.60, 5, 5, '2023-07-10', 1),
+    ('Abito', 250.00, 15, 5, '2023-06-15', 2),
+    ('Auto', 180.00, 20, 5, '2023-05-20', 3);
+
+FORNITORI
+-- Table: public.fornitori
+
+-- DROP TABLE IF EXISTS public.fornitori;
+
+CREATE TABLE IF NOT EXISTS public.fornitori
+(
+    numero_fornitore integer NOT NULL DEFAULT nextval('fornitori_numero_fornitore_seq'::regclass),
+    denominazione character varying COLLATE pg_catalog."default" NOT NULL,
+    regione_residenza character varying COLLATE pg_catalog."default" NOT NULL
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.fornitori
+    OWNER to postgres;
+INSERT INTO public.fornitori (denominazione, regione_residenza)
+VALUES
+    ('Mondo Casa', 'Lombardia'),
+    ('Eurospin', 'Toscana'),
+    ('Armani', 'Veneto');
+
+ESERCIZI
+1. Estrarre nome e cognome dei clienti nati nel 1982
+- SELECT * FROM clienti WHERE EXTRACT(YEAR FROM data_nascita) = 1982;
+
+2. Estrarre il numero delle fatture con iva=20%
+- SELECT * FROM fatture WHERE iva = 20
+
+3. Riportare il numero di fatture e la somma dei relativi importi divisi per anno di fatturazione
+numero fatture = SELECT COUNT(numero_fattura) FROM fatture;
+
+SELECT SUM(importo/EXTRACT(YEAR FROM data_fattura)) AS somma_importi_anno FROM fatture;
+
+
+
+
+
+
+
